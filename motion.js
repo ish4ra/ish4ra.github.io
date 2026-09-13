@@ -6,8 +6,8 @@
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   const clamp = (n,a=0,b=1) => Math.max(a,Math.min(b,n));
   const cards = [...document.querySelectorAll('.project-card')];
-  let paused = reduce.matches, explicitMotion = false;
-  try { const saved=localStorage.getItem('ishara-motion'); if(saved==='on'||saved==='off'){paused=saved==='off';explicitMotion=true;} } catch {}
+  let paused = false, explicitMotion = true;
+try { localStorage.removeItem('ishara-motion'); } catch {}
   function animate(el,frames,options){return !paused && el.animate ? el.animate(frames,options) : null;}
   function syncMotion(){
     root.classList.toggle('motion-paused',paused);
