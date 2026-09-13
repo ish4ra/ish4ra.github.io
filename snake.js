@@ -64,7 +64,7 @@
       ctx.strokeStyle=accent;ctx.globalAlpha=.25+.25*pulse;ctx.lineWidth=1;ctx.strokeRect(x-size*.48,y-size*.48,size*.96,size*.96);ctx.globalAlpha=1;
     }
     const positions=(arrived?game.body:[]).map((p,i)=>{const from=previous[i]||previous[previous.length-1]||p;return{x:(from.x+(p.x-from.x)*blend)*cell+gap/2,y:(from.y+(p.y-from.y)*blend)*cell+gap/2};});
-    for(let i=positions.length-1;i>=0;i--){const p=positions[i],opacity=i===0?1:(isiOS?.9:.35+.6*(1-i/positions.length));if(i===0){ctx.shadowColor=accent;ctx.shadowBlur=isiOS?0:cell*.7;}tile(p.x,p.y,size,accent,opacity,Math.min(5,cell*.2));ctx.shadowBlur=0;}
+    for(let i=positions.length-1;i>=0;i--){const p=positions[i],opacity=i===0?1:(isiOS ? .9 : .35+.6*(1-i/positions.length));if(i===0){ctx.shadowColor=accent;ctx.shadowBlur=isiOS?0:cell*.7;}tile(p.x,p.y,size,accent,opacity,Math.min(5,cell*.2));ctx.shadowBlur=0;}
     const head=positions[0];
     if(head){const cx=head.x+size/2,cy=head.y+size/2,dir=game.dir,eye=Math.max(1.4,cell*.095);ctx.fillStyle=ink;
       for(const side of [-1,1]){const ex=cx+dir.x*size*.22-dir.y*side*size*.22,ey=cy+dir.y*size*.22+dir.x*side*size*.22;ctx.fillRect(ex-eye/2,ey-eye/2,eye,eye);}}
@@ -186,7 +186,7 @@
     travelCtx.clearRect(0,0,travelW,travelH);
     if(!document.querySelector('dialog[open]')){
       for(let i=points.length-1;i>=0;i--){
-        const p=points[i];travelCtx.globalAlpha=i===0?1:(isiOS?.92:.35+.6*(1-i/points.length));travelCtx.fillStyle=accent;
+        const p=points[i];travelCtx.globalAlpha=i===0?1:(isiOS ? .92 : .35+.6*(1-i/points.length));travelCtx.fillStyle=accent;
         travelCtx.shadowColor=accent;travelCtx.shadowBlur=isiOS?0:(i===0?13:0);travelCtx.beginPath();
         if(travelCtx.roundRect)travelCtx.roundRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size,Math.min(5,p.size*.2));
         else travelCtx.rect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
