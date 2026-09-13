@@ -1,6 +1,30 @@
 'use strict';
 (() => {
   const $=s=>document.querySelector(s),root=document.documentElement;
+  const isiOS=/iP(?:hone|ad|od)/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(isiOS&&document.body){
+    const symbolPattern=/([←→↑↓↗↘↻☼✳])[\uFE0E\uFE0F]?/g;
+    const normalizeSymbols=node=>{
+      if(!node)return;
+      if(node.nodeType===Node.TEXT_NODE){
+        const before=node.nodeValue||'',after=before.replace(symbolPattern,'$1\uFE0E');
+        if(after!==before)node.nodeValue=after;
+        return;
+      }
+      const walker=document.createTreeWalker(node,NodeFilter.SHOW_TEXT);let textNode;
+      while((textNode=walker.nextNode())){
+        const before=textNode.nodeValue||'',after=before.replace(symbolPattern,'$1\uFE0E');
+        if(after!==before)textNode.nodeValue=after;
+      }
+    };
+    normalizeSymbols(document.body);
+    new MutationObserver(mutations=>{
+      for(const mutation of mutations){
+        if(mutation.type==='characterData')normalizeSymbols(mutation.target);
+        else mutation.addedNodes.forEach(normalizeSymbols);
+      }
+    }).observe(document.body,{subtree:true,childList:true,characterData:true});
+  }
   const canvas=$('#snake-canvas'),ctx=canvas.getContext('2d'),section=$('#playground');
   if(!ctx||!window.SnakeGame)return;
   const game=new SnakeGame({cols:36,rows:6});
@@ -40,7 +64,7 @@
       ctx.strokeStyle=accent;ctx.globalAlpha=.25+.25*pulse;ctx.lineWidth=1;ctx.strokeRect(x-size*.48,y-size*.48,size*.96,size*.96);ctx.globalAlpha=1;
     }
     const positions=(arrived?game.body:[]).map((p,i)=>{const from=previous[i]||previous[previous.length-1]||p;return{x:(from.x+(p.x-from.x)*blend)*cell+gap/2,y:(from.y+(p.y-from.y)*blend)*cell+gap/2};});
-    for(let i=positions.length-1;i>=0;i--){const p=positions[i],opacity=i===0?1:.35+.6*(1-i/positions.length);if(i===0){ctx.shadowColor=accent;ctx.shadowBlur=cell*.7;}tile(p.x,p.y,size,accent,opacity,Math.min(5,cell*.2));ctx.shadowBlur=0;}
+    for(let i=positions.length-1;i>=0;i--){const p=positions[i],opacity=i===0?1:(isiOS ? .9 : .35+.6*(1-i/positions.length));if(i===0){ctx.shadowColor=accent;ctx.shadowBlur=isiOS?0:cell*.7;}tile(p.x,p.y,size,accent,opacity,Math.min(5,cell*.2));ctx.shadowBlur=0;}
     const head=positions[0];
     if(head){const cx=head.x+size/2,cy=head.y+size/2,dir=game.dir,eye=Math.max(1.4,cell*.095);ctx.fillStyle=ink;
       for(const side of [-1,1]){const ex=cx+dir.x*size*.22-dir.y*side*size*.22,ey=cy+dir.y*size*.22+dir.x*side*size*.22;ctx.fillRect(ex-eye/2,ey-eye/2,eye,eye);}}
@@ -134,7 +158,6 @@
     const boardFits=rect.top>=120&&rect.top+rect.width*game.rows/game.cols<=travelH-40;
     const wantsIn=scrollDirection>0&&boardFits&&rect.top<travelH*.55;
     const phase=wantsIn?'in':scrollDirection>0?'down':'up';
-    const head=d.points[0];
     // The traveler lives in viewport space. Page scroll cannot carry it offscreen.
     // Replan from the currently drawn body when the moving board changes position.
     const boardMoved=phase==='in'&&d.boardTop!==rect.top;
@@ -163,8 +186,8 @@
     travelCtx.clearRect(0,0,travelW,travelH);
     if(!document.querySelector('dialog[open]')){
       for(let i=points.length-1;i>=0;i--){
-        const p=points[i];travelCtx.globalAlpha=i===0?1:.35+.6*(1-i/points.length);travelCtx.fillStyle=accent;
-        travelCtx.shadowColor=accent;travelCtx.shadowBlur=i===0?13:0;travelCtx.beginPath();
+        const p=points[i];travelCtx.globalAlpha=i===0?1:(isiOS ? .92 : .35+.6*(1-i/points.length));travelCtx.fillStyle=accent;
+        travelCtx.shadowColor=accent;travelCtx.shadowBlur=isiOS?0:(i===0?13:0);travelCtx.beginPath();
         if(travelCtx.roundRect)travelCtx.roundRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size,Math.min(5,p.size*.2));
         else travelCtx.rect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
         travelCtx.fill();
