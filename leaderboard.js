@@ -50,7 +50,8 @@
   function createPreview() {
     const section = document.querySelector('#playground');
     const shell = section?.querySelector('.snake-shell');
-    if (!section || !shell || document.querySelector('.snake-leaderboard')) return;
+    const overlay = document.querySelector('#snake-overlay');
+    if (!section || !shell || !overlay || document.querySelector('.snake-leaderboard')) return;
 
     const entry = document.createElement('div');
     entry.className = 'snake-score-entry';
@@ -86,35 +87,55 @@
     const form = document.querySelector('#snake-score-form');
     const input = document.querySelector('#snake-player-name');
     const status = document.querySelector('#snake-score-status');
+    const saveButton = form.querySelector('button');
 
-    window.addEventListener('snake:gameover', event => {
-      const score = Number(event.detail?.score || 0);
-      pendingScore = Number.isInteger(score) ? Math.max(0, Math.min(MAX_SCORE, score)) : 0;
+    const resetEntry = () => {
+      entry.hidden = true;
+      pendingScore = 0;
       status.textContent = '';
+      input.disabled = false;
+      saveButton.disabled = false;
+      saveButton.textContent = 'Save score ↗';
+    };
+
+    const offerSave = () => {
+      if (overlay.hidden) {
+        resetEntry();
+        return;
+      }
+      const score = Number.parseInt(document.querySelector('#snake-score')?.textContent || '0', 10);
+      pendingScore = Number.isInteger(score) ? Math.max(0, Math.min(MAX_SCORE, score)) : 0;
+      if (pendingScore < 1) {
+        entry.hidden = true;
+        return;
+      }
       form.reset();
-      entry.hidden = pendingScore < 1;
-      if (!entry.hidden) setTimeout(() => input.focus({preventScroll:true}), 80);
-    });
+      input.disabled = false;
+      saveButton.disabled = false;
+      saveButton.textContent = 'Save score ↗';
+      status.textContent = '';
+      entry.hidden = false;
+    };
+
+    new MutationObserver(offerSave).observe(overlay, {attributes:true, attributeFilter:['hidden']});
 
     ['snake-play','snake-again','snake-auto'].forEach(id => {
-      document.getElementById(id)?.addEventListener('click', () => {
-        entry.hidden = true;
-        pendingScore = 0;
-        status.textContent = '';
-      });
+      document.getElementById(id)?.addEventListener('click', resetEntry);
     });
 
     form.addEventListener('submit', async event => {
       event.preventDefault();
-      if (!db || pendingScore < 1) return;
+      if (!db || pendingScore < 1) {
+        status.textContent = 'Leaderboard is still loading.';
+        return;
+      }
       const name = safeName(input.value);
       if (!name) {
         status.textContent = 'Enter a name.';
         input.focus();
         return;
       }
-      const button = form.querySelector('button');
-      button.disabled = true;
+      saveButton.disabled = true;
       status.textContent = 'Saving…';
       try {
         await db.collection('scores').add({
@@ -124,13 +145,13 @@
         });
         status.textContent = 'Score saved.';
         input.disabled = true;
-        button.textContent = 'Saved ✓';
+        saveButton.textContent = 'Saved ✓';
         pendingScore = 0;
         await refreshTopThree();
       } catch (error) {
         console.error('Leaderboard save failed:', error);
         status.textContent = 'Could not save. Try again.';
-        button.disabled = false;
+        saveButton.disabled = false;
       }
     });
   }
