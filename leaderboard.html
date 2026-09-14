@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101311">
+  <meta name="description" content="Global snake leaderboard from Ishara Lakshan's portfolio.">
+  <title>Snake Leaderboard — Ishara Lakshan</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c6f37b'/%3E%3Ctext x='12' y='43' font-family='Arial' font-size='32' font-weight='bold' fill='%23101311'%3Eil.%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css?v=18">
+  <link rel="stylesheet" href="leaderboard.css?v=1">
+  <script src="leaderboard.js?v=1" defer></script>
+</head>
+<body class="leaderboard-page">
+  <header>
+    <a class="brand" href="./" aria-label="Back to Ishara Lakshan portfolio">il<span>.</span></a>
+    <nav aria-label="Leaderboard navigation"><a href="./#playground">Play snake</a><a href="./#work">Work</a></nav>
+    <a class="contact-link" href="./">Portfolio <span aria-hidden="true">↗︎</span></a>
+  </header>
+  <main>
+    <a class="leaderboard-back" href="./#playground">← Back to the game</a>
+    <section class="leaderboard-hero">
+      <div>
+        <p class="eyebrow">SNAKE / GLOBAL SCORES</p>
+        <h1>Leaderboard<em>.</em></h1>
+      </div>
+      <p>Every saved run from the portfolio snake game, ranked from highest score to lowest.</p>
+    </section>
+    <section class="leaderboard-panel" aria-labelledby="leaderboard-title">
+      <h2 id="leaderboard-title" class="sr-only">Snake scores</h2>
+      <div class="leaderboard-panel-head" aria-hidden="true"><span>RANK</span><span>PLAYER</span><span>SCORE</span><span>DATE</span></div>
+      <div id="full-leaderboard" aria-live="polite"><div class="leaderboard-row leaderboard-empty">Loading leaderboard…</div></div>
+    </section>
+    <div class="leaderboard-meta"><span id="leaderboard-count">Loading scores…</span><a href="./#playground">Play a round ↗︎</a></div>
+  </main>
+</body>
+</html>
