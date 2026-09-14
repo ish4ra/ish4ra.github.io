@@ -41,6 +41,7 @@
   if(!travelCtx)arrived=true;
   traveler.hidden=arrived;
   let travelW=0,travelH=0,lastBoardRect=null;
+  const TRAVEL_BODY_LIMIT=9;
 
   try{best=Math.max(0,Number(localStorage.getItem('ishara-snake-best'))||0);}catch{}
   $('#snake-best').textContent=String(best).padStart(2,'0');
@@ -137,20 +138,22 @@
     if(arrived||document.hidden||!travelCtx)return;
     if(root.classList.contains('motion-paused')){finishJourney();return;}
     const rect=canvas.getBoundingClientRect(),clamp=n=>Math.max(0,Math.min(1,n));
-    const compact=travelW<600,baseSize=compact?9:13,spacing=Math.min(baseSize+3,(travelH-120)/(game.body.length+2));
+    const journeyLength=departure?.body?.length||(game.over?Math.min(game.body.length,TRAVEL_BODY_LIMIT):game.body.length);
+    const compact=travelW<600,baseSize=compact?9:13,spacing=Math.min(baseSize+3,(travelH-120)/(journeyLength+2));
     // Restore the original scroll-progress travel instead of two fixed rail stops.
     const destination=Math.max(1,rect.top+scrollY-travelH*.45);
     const progress=clamp(scrollY/destination);
     const afterBoard=clamp((scrollY-destination)/Math.max(travelH,root.scrollHeight-travelH-destination));
     const railX=travelW-(compact?24:42)+Math.sin(progress*7+afterBoard*3)*(compact?6:11);
-    const bodyMargin=game.body.length*spacing+32;
+    const bodyMargin=journeyLength*spacing+32;
     const railY=Math.max(bodyMargin,Math.min(travelH-bodyMargin,
       Math.max(175,travelH*.24)+progress*travelH*.24+afterBoard*travelH*.16));
     const cell=rect.width/game.cols;
     const insideSize=cell-Math.max(2,cell*.22);
     if(!departure){
-      const source=game.body.map((_,i)=>({x:railX,y:railY-i*spacing}));
-      departure={body:game.body.map(p=>({...p})),points:source,size:baseSize,last:now,speed:160,phase:null,snapshot:null};
+      const seedBody=game.over?game.body.slice(0,TRAVEL_BODY_LIMIT):game.body;
+      const source=seedBody.map((_,i)=>({x:railX,y:railY-i*spacing}));
+      departure={body:seedBody.map(p=>({...p})),points:source,size:baseSize,last:now,speed:160,phase:null,snapshot:null};
     }
     const d=departure,dt=Math.min(40,Math.max(0,now-d.last))/1000;d.last=now;
     // Keep entry inside the departure thresholds: crossing an edge must not
@@ -214,13 +217,14 @@
     const interval=game.mode==='demo'?105:130;
     const blend=frame?Math.max(0,Math.min(1,(performance.now()-lastStep)/interval)):1;
     const savedPrevious=previous.map(p=>({...p}));
-    const body=game.body.map((p,i)=>{const from=previous[i]||previous[previous.length-1]||p;return{x:from.x+(p.x-from.x)*blend,y:from.y+(p.y-from.y)*blend};});
+    const fullBody=game.body.map((p,i)=>{const from=previous[i]||previous[previous.length-1]||p;return{x:from.x+(p.x-from.x)*blend,y:from.y+(p.y-from.y)*blend};});
+    const body=game.over?fullBody.slice(0,TRAVEL_BODY_LIMIT):fullBody;
     stop();arrived=false;entry=null;
     const anchor=(rect.top<0||rect.top+rect.width/6>travelH)?(lastBoardRect||rect):rect;
     const cell=anchor.width/game.cols;
     const source=body.map(p=>({x:Math.max(16,Math.min(travelW-16,anchor.left+(p.x+.5)*cell)),y:Math.max(24,Math.min(travelH-24,anchor.top+(p.y+.5)*cell))}));
     const size=cell-Math.max(2,cell*.22);
-    departure={body,points:source,size,phase:null,speed:cell/(interval/1000),snapshot:blend<1?{previous:savedPrevious,blend}:null,last:performance.now()};
+    departure={body,points:source,size,phase:null,speed:cell/(interval/1000),snapshot:game.over?null:(blend<1?{previous:savedPrevious,blend}:null),last:performance.now()};
     traveler.hidden=false;updateUI();render();startJourney();
   },{passive:true});
 
