@@ -8,8 +8,8 @@
   <title>Snake Leaderboard — Ishara Lakshan</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23c6f37b'/%3E%3Ctext x='12' y='43' font-family='Arial' font-size='32' font-weight='bold' fill='%23101311'%3Eil.%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="style.css?v=18">
-  <link rel="stylesheet" href="leaderboard.css?v=3">
-  <script src="leaderboard.js?v=1" defer></script>
+  <link rel="stylesheet" href="leaderboard.css?v=4">
+  <script src="leaderboard.js?v=2" defer></script>
   <script src="leaderboard-motion.js?v=2" defer></script>
 </head>
 <body class="leaderboard-page">
@@ -26,10 +26,14 @@
         <p class="eyebrow">SNAKE / GLOBAL SCORES</p>
         <h1>Leaderboard<em>.</em></h1>
       </div>
-      <p>Every saved run from the portfolio snake game, ranked from highest score to lowest.</p>
+      <p>One best score per player by default. Every saved run is still available in the full log.</p>
     </section>
     <section class="leaderboard-panel" aria-labelledby="leaderboard-title">
       <h2 id="leaderboard-title" class="sr-only">Snake scores</h2>
+      <div class="leaderboard-view-switch" aria-label="Leaderboard view">
+        <button type="button" class="is-active" data-leaderboard-view="best" aria-pressed="true">BEST SCORES</button>
+        <button type="button" data-leaderboard-view="all" aria-pressed="false">ALL RUNS</button>
+      </div>
       <div class="leaderboard-panel-head" aria-hidden="true"><span>RANK</span><span>PLAYER</span><span>SCORE</span><span>DATE</span></div>
       <div id="full-leaderboard" aria-live="polite"><div class="leaderboard-row leaderboard-empty">Loading leaderboard…</div></div>
     </section>

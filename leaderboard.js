@@ -14,6 +14,8 @@
   const MAX_SCORE = 216;
   let db = null;
   let pendingScore = 0;
+  let fullLeaderboardEntries = [];
+  let leaderboardView = 'best';
 
   const loadScript = src => new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[src="${src}"]`);
@@ -45,7 +47,30 @@
     .trim()
     .slice(0, 20);
 
+  const playerKey = value => safeName(String(value || 'Player')).toLowerCase();
   const scoreText = score => String(score).padStart(2, '0');
+
+  const entryFromDoc = doc => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      name: safeName(String(data.name || 'Player')) || 'Player',
+      score: Number(data.score || 0),
+      createdAt: data.createdAt || null
+    };
+  };
+
+  function bestPerPlayer(entries) {
+    const seen = new Set();
+    const best = [];
+    for (const entry of entries) {
+      const key = playerKey(entry.name);
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      best.push(entry);
+    }
+    return best;
+  }
 
   function createPreview() {
     const section = document.querySelector('#playground');
@@ -160,19 +185,18 @@
     const list = document.querySelector('#snake-top-three');
     if (!db || !list) return;
     try {
-      const snapshot = await db.collection('scores').orderBy('score', 'desc').limit(3).get();
+      const snapshot = await db.collection('scores').orderBy('score', 'desc').get();
+      const entries = bestPerPlayer(snapshot.docs.map(entryFromDoc)).slice(0, 3);
       list.textContent = '';
-      const docs = snapshot.docs;
       for (let i = 0; i < 3; i++) {
         const li = document.createElement('li');
         const rank = document.createElement('span');
         const name = document.createElement('strong');
         const score = document.createElement('b');
         rank.textContent = String(i + 1).padStart(2, '0');
-        if (docs[i]) {
-          const data = docs[i].data();
-          name.textContent = safeName(String(data.name || 'Player')) || 'Player';
-          score.textContent = scoreText(Number(data.score || 0));
+        if (entries[i]) {
+          name.textContent = entries[i].name;
+          score.textContent = scoreText(entries[i].score);
         } else {
           name.textContent = 'Open slot';
           score.textContent = '--';
@@ -192,36 +216,68 @@
     return timestamp.toDate().toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'});
   }
 
+  function renderLeaderboardRows() {
+    const body = document.querySelector('#full-leaderboard');
+    const count = document.querySelector('#leaderboard-count');
+    if (!body || !count) return;
+
+    const entries = leaderboardView === 'best' ? bestPerPlayer(fullLeaderboardEntries) : fullLeaderboardEntries;
+    body.textContent = '';
+
+    if (leaderboardView === 'best') {
+      count.textContent = `${entries.length} player${entries.length === 1 ? '' : 's'} · ${fullLeaderboardEntries.length} saved run${fullLeaderboardEntries.length === 1 ? '' : 's'}`;
+    } else {
+      count.textContent = `${entries.length} recorded run${entries.length === 1 ? '' : 's'}`;
+    }
+
+    if (!entries.length) {
+      const row = document.createElement('div');
+      row.className = 'leaderboard-row leaderboard-empty';
+      row.textContent = 'No scores yet. Be the first.';
+      body.append(row);
+      return;
+    }
+
+    entries.forEach((entry, index) => {
+      const row = document.createElement('div');
+      row.className = 'leaderboard-row';
+      const rank = document.createElement('span');
+      const name = document.createElement('strong');
+      const score = document.createElement('b');
+      const date = document.createElement('time');
+      rank.textContent = String(index + 1).padStart(2, '0');
+      name.textContent = entry.name;
+      score.textContent = scoreText(entry.score);
+      date.textContent = formatDate(entry.createdAt);
+      row.append(rank, name, score, date);
+      body.append(row);
+    });
+  }
+
+  function setupLeaderboardViewSwitch() {
+    const controls = document.querySelectorAll('[data-leaderboard-view]');
+    if (!controls.length) return;
+    controls.forEach(button => {
+      button.addEventListener('click', () => {
+        leaderboardView = button.dataset.leaderboardView === 'all' ? 'all' : 'best';
+        controls.forEach(control => {
+          const active = control.dataset.leaderboardView === leaderboardView;
+          control.classList.toggle('is-active', active);
+          control.setAttribute('aria-pressed', String(active));
+        });
+        renderLeaderboardRows();
+      });
+    });
+  }
+
   async function renderFullLeaderboard() {
     const body = document.querySelector('#full-leaderboard');
     const count = document.querySelector('#leaderboard-count');
     if (!body || !db) return;
     try {
       const snapshot = await db.collection('scores').orderBy('score', 'desc').get();
-      body.textContent = '';
-      count.textContent = `${snapshot.size} recorded run${snapshot.size === 1 ? '' : 's'}`;
-      if (!snapshot.size) {
-        const row = document.createElement('div');
-        row.className = 'leaderboard-row leaderboard-empty';
-        row.textContent = 'No scores yet. Be the first.';
-        body.append(row);
-        return;
-      }
-      snapshot.docs.forEach((doc, index) => {
-        const data = doc.data();
-        const row = document.createElement('div');
-        row.className = 'leaderboard-row';
-        const rank = document.createElement('span');
-        const name = document.createElement('strong');
-        const score = document.createElement('b');
-        const date = document.createElement('time');
-        rank.textContent = String(index + 1).padStart(2, '0');
-        name.textContent = safeName(String(data.name || 'Player')) || 'Player';
-        score.textContent = scoreText(Number(data.score || 0));
-        date.textContent = formatDate(data.createdAt);
-        row.append(rank, name, score, date);
-        body.append(row);
-      });
+      fullLeaderboardEntries = snapshot.docs.map(entryFromDoc);
+      renderLeaderboardRows();
     } catch (error) {
       console.error('Full leaderboard load failed:', error);
       body.innerHTML = '<div class="leaderboard-row leaderboard-empty">Leaderboard unavailable right now.</div>';
@@ -231,6 +287,7 @@
 
   async function init() {
     createPreview();
+    setupLeaderboardViewSwitch();
     try {
       await firebaseReady();
       await Promise.all([refreshTopThree(), renderFullLeaderboard()]);
