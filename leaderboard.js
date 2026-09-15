@@ -46,6 +46,7 @@
     .slice(0, 20);
 
   const scoreText = score => String(score).padStart(2, '0');
+  const playerKey = value => safeName(String(value || 'Player')).toLowerCase();
 
   function createPreview() {
     const section = document.querySelector('#playground');
@@ -160,19 +161,30 @@
     const list = document.querySelector('#snake-top-three');
     if (!db || !list) return;
     try {
-      const snapshot = await db.collection('scores').orderBy('score', 'desc').limit(3).get();
+      const snapshot = await db.collection('scores').orderBy('score', 'desc').get();
+      const seen = new Set();
+      const topPlayers = [];
+
+      for (const doc of snapshot.docs) {
+        const data = doc.data();
+        const name = safeName(String(data.name || 'Player')) || 'Player';
+        const key = playerKey(name);
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+        topPlayers.push({name, score: Number(data.score || 0)});
+        if (topPlayers.length === 3) break;
+      }
+
       list.textContent = '';
-      const docs = snapshot.docs;
       for (let i = 0; i < 3; i++) {
         const li = document.createElement('li');
         const rank = document.createElement('span');
         const name = document.createElement('strong');
         const score = document.createElement('b');
         rank.textContent = String(i + 1).padStart(2, '0');
-        if (docs[i]) {
-          const data = docs[i].data();
-          name.textContent = safeName(String(data.name || 'Player')) || 'Player';
-          score.textContent = scoreText(Number(data.score || 0));
+        if (topPlayers[i]) {
+          name.textContent = topPlayers[i].name;
+          score.textContent = scoreText(topPlayers[i].score);
         } else {
           name.textContent = 'Open slot';
           score.textContent = '--';
