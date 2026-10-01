@@ -11,7 +11,7 @@ if ('IntersectionObserver' in window) {
 
   const reveal = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); reveal.unobserve(entry.target); } }), { threshold: 0.08 });
   document.querySelectorAll('.reveal').forEach(el => reveal.observe(el));
-  const nav = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) document.querySelectorAll('nav a').forEach(a => { const active = a.hash === `#${entry.target.id}`; a.classList.toggle('active', active); if (active) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); }); }), { rootMargin: '-15% 0px -65% 0px' });
+  const nav = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) document.querySelectorAll('nav a[data-scroll-target]').forEach(a => { const active = a.dataset.scrollTarget === entry.target.id; a.classList.toggle('active', active); if (active) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current'); }); }), { rootMargin: '-15% 0px -65% 0px' });
   document.querySelectorAll('main section').forEach(el => nav.observe(el));
 }
 let queued = false;
@@ -33,7 +33,7 @@ document.querySelectorAll('dialog').forEach(dialog => { dialog.querySelector('.c
 const commands = $('#commands');
 $('#commands-button').addEventListener('click', () => commands.showModal());
 addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); if (commands.open) commands.close(); else { projectDialog.close(); commands.showModal(); } } });
-document.querySelectorAll('.command-links a').forEach(a => a.addEventListener('click', () => { commands.close(); const section = document.querySelector(a.hash); section.setAttribute('tabindex', '-1'); section.focus({preventScroll:true}); }));
+document.querySelectorAll('.command-links a').forEach(a => a.addEventListener('click', () => commands.close()));
 let toastTimer;
 function toast(message) { $('#toast').textContent = message; $('#toast').classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.remove('show'), 3000); }
 $('#copy-email').addEventListener('click', async () => { try { await navigator.clipboard.writeText('ishara@tuta.io'); toast('Email address copied.'); } catch { toast('Email: ishara@tuta.io'); } });

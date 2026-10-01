@@ -8,7 +8,21 @@
   <meta http-equiv="refresh" content="0; url=/orvix/">
   <title>Redirecting to Orvix…</title>
   <script>
-    location.replace('/orvix/' + location.search + location.hash);
+    (() => {
+      let target = '';
+      try { target = decodeURIComponent(location.hash.slice(1)); }
+      catch { target = location.hash.slice(1); }
+      if (target) {
+        try {
+          sessionStorage.setItem('ishara-clean-scroll-target', JSON.stringify({
+            path: '/orvix/',
+            target,
+            focus: false
+          }));
+        } catch {}
+      }
+      location.replace('/orvix/' + location.search);
+    })();
   </script>
 </head>
 <body>

@@ -8,7 +8,21 @@
   <meta http-equiv="refresh" content="0; url=/leaderboard/">
   <title>Redirecting to Snake Leaderboard…</title>
   <script>
-    location.replace('/leaderboard/' + location.search + location.hash);
+    (() => {
+      let target = '';
+      try { target = decodeURIComponent(location.hash.slice(1)); }
+      catch { target = location.hash.slice(1); }
+      if (target) {
+        try {
+          sessionStorage.setItem('ishara-clean-scroll-target', JSON.stringify({
+            path: '/leaderboard/',
+            target,
+            focus: false
+          }));
+        } catch {}
+      }
+      location.replace('/leaderboard/' + location.search);
+    })();
   </script>
 </head>
 <body>
