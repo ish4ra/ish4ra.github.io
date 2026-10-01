@@ -47,33 +47,26 @@
       const reversing=direction.y*sign<-.45;
 
       if(reversing){
-        // A direct U-turn folds several body offsets into the same tiny curve.
-        // Give the snake room to step inward, sweep a wide loop, then return
-        // to the rail facing the new scroll direction.
+        // Do not squeeze the body through a tight U-turn. Move slightly
+        // inward and follow a true semicircle, which preserves segment
+        // spacing while the head turns to face the opposite scroll direction.
         const compact=!!bounds&&bounds.width<600;
         const gaps=body.slice(1).map((p,i)=>Math.hypot(p.x-body[i].x,p.y-body[i].y)).filter(Boolean);
         const averageGap=gaps.length?gaps.reduce((a,b)=>a+b,0)/gaps.length:(compact?12:16);
-        const radius=Math.max(compact?54:82,Math.min(compact?84:128,averageGap*(body.length+1)*.78));
-        const side=!bounds||target.x>bounds.width*.55?-1:1;
-        const minX=compact?18:24,maxX=(bounds?.width||innerWidth)-(compact?18:24);
-        const minY=compact?30:38,maxY=(bounds?.height||innerHeight)-(compact?30:38);
-        const mid={
-          x:Math.max(minX,Math.min(maxX,head.x+side*radius)),
-          y:Math.max(minY,Math.min(maxY,head.y+direction.y*radius*.9))
-        };
-        const horizontal=Math.max(24,Math.abs(mid.x-head.x)*.48);
-        const vertical=Math.max(28,radius*.55);
+        const radius=Math.max(compact?34:48,Math.min(compact?46:60,averageGap*3.25));
+        const side=!bounds||head.x>bounds.width*.55?-1:1;
+        const centerX=head.x+side*radius,centerY=head.y;
+        const startAngle=side<0?0:Math.PI;
+        const deltaAngle=direction.y*(side<0?1:-1)*Math.PI;
+        const steps=72;
 
-        curve(
-          mid,
-          {x:head.x,y:head.y+direction.y*vertical},
-          {x:mid.x-side*horizontal,y:mid.y}
-        );
-        curve(
-          target,
-          {x:mid.x+side*horizontal,y:mid.y},
-          {x:target.x,y:target.y-sign*vertical}
-        );
+        for(let i=1;i<=steps;i++){
+          const t=i/steps,angle=startAngle+deltaAngle*t;
+          points.push({
+            x:centerX+Math.cos(angle)*radius,
+            y:centerY+Math.sin(angle)*radius
+          });
+        }
       }else{
         // Tiny continued scrolls keep the original compact movement.
         const reach=continuing?Math.min(160,distance*.4):Math.max(45,Math.min(160,distance*.4));
