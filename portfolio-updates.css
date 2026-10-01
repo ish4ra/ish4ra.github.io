@@ -1,0 +1,35 @@
+:root{--orvix-accent:#B9FF45}
+.open-source-section,.support-section{position:relative}
+.oss-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.oss-card{position:relative;min-height:255px;padding:27px;border:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column;gap:15px;overflow:hidden;isolation:isolate;transition:transform .25s,border-color .25s,background .25s}
+.oss-card::before{content:'';position:absolute;inset:auto -30% -65% 30%;height:230px;border:1px solid var(--line);border-radius:50%;opacity:.45;z-index:-1;transition:transform .45s,border-color .25s}
+.oss-card:hover,.oss-card:focus-visible{transform:translateY(-5px);border-color:var(--accent)}
+.oss-card:hover::before,.oss-card:focus-visible::before{transform:translate(-25px,-20px) scale(1.08);border-color:var(--accent)}
+.oss-card h3{font:500 clamp(27px,3vw,42px)/1.08 Manrope,sans-serif;letter-spacing:-1.4px;margin:0}
+.oss-card p{color:var(--muted);font-size:14px;line-height:1.75;max-width:620px;margin:0}
+.oss-kicker,.oss-feature-badge,.support-label{font:10px/1.4 monospace;letter-spacing:1.25px;color:var(--accent)}
+.oss-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:auto;padding-top:10px}
+.oss-tags span{border:1px solid var(--line);padding:4px 8px;font:10px monospace;color:var(--muted)}
+.oss-arrow{font:11px monospace;letter-spacing:.7px;color:var(--accent);align-self:flex-end;margin-top:4px}
+.oss-featured{grid-column:1 / -1;min-height:330px;padding:34px;background:linear-gradient(120deg,#070a08 0%,#0d120e 66%,#14220f 100%);border-color:#2d4026;color:#f4f7f0}
+.oss-featured::before{width:520px;height:520px;right:-150px;left:auto;bottom:-280px;border-color:color-mix(in srgb,var(--orvix-accent) 28%,transparent);box-shadow:0 0 0 42px #b9ff4508,0 0 0 86px #b9ff4505}
+.oss-featured:hover,.oss-featured:focus-visible{border-color:var(--orvix-accent);background:linear-gradient(120deg,#070a08 0%,#0d120e 58%,#172811 100%)}
+.oss-featured .oss-feature-badge,.oss-featured .oss-kicker,.oss-featured .oss-arrow{color:var(--orvix-accent)}
+.oss-featured .oss-tags span{border-color:#31422c;color:#b5c1af}
+.oss-featured p{color:#adb8a8;font-size:16px;max-width:760px}
+.oss-feature-copy{display:flex;flex-direction:column;gap:17px;max-width:820px}
+.oss-title-row{display:flex;align-items:center;gap:18px}
+.oss-orvix-icon{width:72px;height:72px;object-fit:contain;filter:drop-shadow(0 10px 28px #0008)}
+.oss-title-row h3{font-size:clamp(46px,6vw,78px);letter-spacing:-3px}
+.support-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.support-card{position:relative;min-height:245px;padding:27px;background:var(--bg);display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:start;transition:background .3s,color .3s}
+.support-card:hover,.support-card:focus-visible{background:var(--accent);color:var(--ink)}
+.support-card:hover .support-label,.support-card:focus-visible .support-label,.support-card:hover p,.support-card:focus-visible p{color:var(--ink)}
+.support-mark{width:42px;height:42px;border:1px solid var(--line);display:grid;place-items:center;font:600 16px Manrope,sans-serif;color:var(--accent)}
+.support-card:hover .support-mark,.support-card:focus-visible .support-mark{border-color:color-mix(in srgb,var(--ink) 35%,transparent);color:var(--ink)}
+.support-card h3{font:500 24px/1.15 Manrope,sans-serif;letter-spacing:-.8px;margin:8px 0 12px}
+.support-card p{color:var(--muted);font-size:13px;line-height:1.7;margin:0}
+.support-arrow{font-size:22px;transition:transform .3s}
+.support-card:hover .support-arrow,.support-card:focus-visible .support-arrow{transform:rotate(45deg)}
+@media(max-width:900px){.oss-grid{grid-template-columns:1fr}.oss-featured{grid-column:auto}.support-grid{grid-template-columns:1fr}.support-card{min-height:180px}.oss-title-row h3{font-size:54px}}
+@media(max-width:600px){.oss-card,.oss-featured{padding:22px;min-height:245px}.oss-featured{min-height:320px}.oss-orvix-icon{width:58px;height:58px}.oss-title-row{gap:13px}.oss-title-row h3{font-size:44px}.oss-featured p{font-size:14px}.support-card{padding:22px;grid-template-columns:auto 1fr;min-height:165px}.support-arrow{position:absolute;right:20px;bottom:18px}.support-mark{width:38px;height:38px}}
