@@ -76,7 +76,7 @@
     preview.innerHTML = `
       <div class="snake-leaderboard-head">
         <div><span class="snake-leaderboard-kicker">GLOBAL LEADERBOARD</span><h3>Top players<span>.</span></h3></div>
-        <a href="leaderboard.html">Full leaderboard ↗</a>
+        <a href="/leaderboard/">Full leaderboard ↗</a>
       </div>
       <ol id="snake-top-three" class="snake-top-three" aria-live="polite">
         <li class="is-loading"><span>01</span><strong>Loading</strong><b>--</b></li>
