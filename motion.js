@@ -6,6 +6,8 @@
   const fine = matchMedia('(hover: hover) and (pointer: fine)');
   const clamp = (n,a=0,b=1) => Math.max(a,Math.min(b,n));
   const cards = [...document.querySelectorAll('.project-card')];
+  const workMeterFill = q('.work-meter i');
+  if(workMeterFill) workMeterFill.style.width = `${100 / Math.max(cards.length, 1)}%`;
   let paused = false, explicitMotion = true;
 try { localStorage.removeItem('ishara-motion'); } catch {}
   function animate(el,frames,options){return !paused && el.animate ? el.animate(frames,options) : null;}
@@ -199,7 +201,7 @@ try { localStorage.removeItem('ishara-motion'); } catch {}
     if(horizontal){
       const x=clamp(scrollY-startY,0,travel);track.style.transform=`translate3d(${-x}px,0,0)`;
       const step=cards[1].offsetLeft-cards[0].offsetLeft;setActive(Math.round(x/step));
-      q('.work-meter i').style.transform=`translateX(${travel?x/travel*300:0}%)`;
+      q('.work-meter i').style.transform=`translateX(${travel?x/travel*((cards.length-1)*100):0}%)`;
       cards.forEach(card=>{const center=card.offsetLeft-x;card.style.setProperty('--cover-shift',`${clamp(-center/innerWidth,-1,1)*70}px`);});
     }
     const rect=copy.getBoundingClientRect(),progress=clamp((innerHeight*.9-rect.top)/(innerHeight*.6));
