@@ -1,0 +1,48 @@
+:root{--orvix:#B9FF45;--orvix-soft:#CBFF75;--orvix-bg:#050806;--orvix-panel:#0B0F0C}
+.orvix-page{background:var(--bg)}
+.orvix-header{max-width:1440px}
+.orvix-main{max-width:1440px;margin:auto}
+.orvix-hero{margin:0 6%;padding:78px 0 90px;display:grid;grid-template-columns:1.05fr .95fr;gap:7%;align-items:center;min-height:calc(100vh - 90px)}
+.orvix-brandline{display:flex;align-items:center;gap:16px;font:10px monospace;letter-spacing:1.4px;color:var(--muted)}
+.orvix-brandline img{width:58px;height:58px;object-fit:contain}
+.orvix-hero h1{font-size:clamp(78px,11vw,170px);line-height:.86;letter-spacing:-.075em;margin:34px 0 28px;font-weight:600}
+.orvix-hero h1 span,.orvix-section h2 span{color:var(--orvix)}
+.orvix-lead{max-width:720px;font-size:clamp(18px,2vw,25px);line-height:1.65;color:var(--muted);margin-bottom:33px}
+.orvix-actions{display:flex;gap:12px;flex-wrap:wrap}
+.orvix-actions .primary{background:var(--orvix);border-color:var(--orvix);color:#10150f}
+.orvix-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:32px}.orvix-meta span{font:10px monospace;letter-spacing:1px;border:1px solid var(--line);padding:7px 9px;color:var(--muted)}
+.orvix-banner-frame{position:relative;border:1px solid #263022;background:var(--orvix-bg);padding:18px;overflow:hidden}
+.orvix-banner-frame::before{content:'';position:absolute;width:420px;height:420px;border:1px solid #b9ff4524;border-radius:50%;right:-170px;bottom:-210px;box-shadow:0 0 0 45px #b9ff4508,0 0 0 90px #b9ff4505}
+.orvix-banner-frame img{display:block;width:100%;height:auto;position:relative;z-index:1}
+.orvix-section{margin:0 6%;padding:90px 0;border-top:1px solid var(--line)}
+.orvix-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:35px;margin-bottom:38px}
+.orvix-section-head h2{font-size:clamp(42px,6vw,78px);letter-spacing:-3px;margin:0}
+.orvix-section-head>p{max-width:340px;color:var(--muted);font-size:15px;margin:0}
+.release-status{min-width:250px;border-left:1px solid var(--line);padding-left:22px;display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.release-status span,.download-kicker,.orvix-link-grid>a>span{font:10px monospace;letter-spacing:1.2px;color:var(--orvix)}
+.release-status strong{font:500 23px Manrope,sans-serif;letter-spacing:-.7px}
+.release-status small{font-size:11px;color:var(--muted)}
+.download-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.download-card{position:relative;min-height:235px;border:1px solid var(--line);padding:27px;display:grid;grid-template-columns:70px 1fr auto;gap:22px;align-items:start;background:var(--panel);transition:transform .25s,border-color .25s,background .25s}
+.download-card:hover,.download-card:focus-visible{transform:translateY(-5px);border-color:var(--orvix);background:color-mix(in srgb,var(--panel) 88%,var(--orvix) 12%)}
+.download-card h3{font:500 29px/1.1 Manrope,sans-serif;letter-spacing:-1px;margin:8px 0 10px}
+.download-card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 18px}
+.download-card small{font:10px monospace;color:var(--muted);overflow-wrap:anywhere}
+.download-arrow{font-size:29px;color:var(--orvix)}
+.platform-icon{width:62px;height:62px;border:1px solid #34422e;background:#091008;display:block;position:relative;color:var(--orvix)}
+.windows-icon{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:13px}.windows-icon i{display:block;background:currentColor}
+.phone-icon{border-radius:11px}.phone-icon i{position:absolute;inset:10px 15px 14px;border:2px solid currentColor;border-radius:5px}.phone-icon b{position:absolute;width:10px;height:2px;background:currentColor;left:25px;bottom:7px}
+.tv-icon i{position:absolute;inset:13px 9px 17px;border:2px solid currentColor}.tv-icon::before,.tv-icon::after{content:'';position:absolute;width:18px;height:2px;background:currentColor;bottom:9px}.tv-icon::before{left:12px;transform:rotate(-17deg)}.tv-icon::after{right:12px;transform:rotate(17deg)}
+.laptop-icon i{position:absolute;inset:11px 10px 20px;border:2px solid currentColor;border-radius:2px}.laptop-icon b{position:absolute;left:7px;right:7px;bottom:12px;height:3px;background:currentColor}
+.download-note{color:var(--muted);font-size:12px;margin:20px 0 0}
+.orvix-link-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.orvix-link-grid>a{position:relative;min-height:230px;padding:28px;background:var(--bg);transition:background .3s,color .3s}
+.orvix-link-grid>a:hover,.orvix-link-grid>a:focus-visible{background:var(--orvix);color:#10150f}
+.orvix-link-grid>a:hover>span,.orvix-link-grid>a:focus-visible>span,.orvix-link-grid>a:hover p,.orvix-link-grid>a:focus-visible p{color:#10150f}
+.orvix-link-grid h3{font:500 clamp(21px,2vw,29px)/1.15 Manrope,sans-serif;letter-spacing:-.8px;margin:22px 0 13px;overflow-wrap:anywhere}
+.orvix-link-grid p{font-size:13px;color:var(--muted);line-height:1.7;max-width:310px}
+.orvix-link-grid b{position:absolute;right:24px;bottom:22px;font-size:22px;font-weight:400}
+.orvix-footer{max-width:1440px;margin:auto}
+.orvix-footer>span{font-size:11px}
+@media(max-width:1000px){.orvix-hero{grid-template-columns:1fr;min-height:auto;padding-top:55px}.orvix-banner-frame{max-width:780px}.download-grid{grid-template-columns:1fr}.orvix-link-grid{grid-template-columns:1fr}.orvix-link-grid>a{min-height:180px}}
+@media(max-width:700px){.orvix-header nav{display:none}.orvix-hero,.orvix-section{margin-left:5%;margin-right:5%}.orvix-hero{padding:45px 0 65px}.orvix-hero h1{font-size:76px;margin:27px 0 20px}.orvix-lead{font-size:17px}.orvix-actions{flex-direction:column;align-items:stretch}.orvix-actions .button{width:100%}.orvix-banner-frame{padding:10px}.orvix-section{padding:62px 0}.orvix-section-head{display:block}.release-status{margin-top:24px;border-left:0;border-top:1px solid var(--line);padding:17px 0 0}.orvix-section-head h2{font-size:48px}.download-card{grid-template-columns:55px 1fr;padding:21px;gap:16px;min-height:205px}.platform-icon{width:52px;height:52px}.download-arrow{position:absolute;right:20px;bottom:17px}.orvix-link-grid>a{padding:22px}.orvix-footer{padding-left:5%;padding-right:5%}}
