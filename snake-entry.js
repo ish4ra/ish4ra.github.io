@@ -53,7 +53,7 @@
         const compact=!!bounds&&bounds.width<600;
         const gaps=body.slice(1).map((p,i)=>Math.hypot(p.x-body[i].x,p.y-body[i].y)).filter(Boolean);
         const averageGap=gaps.length?gaps.reduce((a,b)=>a+b,0)/gaps.length:(compact?12:16);
-        const radius=Math.max(compact?46:68,Math.min(compact?68:96,averageGap*(body.length+1)*.62));
+        const radius=Math.max(compact?54:82,Math.min(compact?84:128,averageGap*(body.length+1)*.78));
         const side=!bounds||target.x>bounds.width*.55?-1:1;
         const minX=compact?18:24,maxX=(bounds?.width||innerWidth)-(compact?18:24);
         const minY=compact?30:38,maxY=(bounds?.height||innerHeight)-(compact?30:38);
