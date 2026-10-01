@@ -140,161 +140,70 @@
     const rect=canvas.getBoundingClientRect(),clamp=n=>Math.max(0,Math.min(1,n));
     const journeyLength=departure?.body?.length||(game.over?Math.min(game.body.length,TRAVEL_BODY_LIMIT):game.body.length);
     const compact=travelW<600,baseSize=compact?9:13,spacing=Math.min(baseSize+3,(travelH-120)/(journeyLength+2));
-
-    // Keep the original traveling feel: the snake drifts with page progress
-    // and gently wanders on the right edge, but its body no longer stretches.
+    // Restore the original scroll-progress travel instead of two fixed rail stops.
     const destination=Math.max(1,rect.top+scrollY-travelH*.45);
     const progress=clamp(scrollY/destination);
     const afterBoard=clamp((scrollY-destination)/Math.max(travelH,root.scrollHeight-travelH-destination));
     const railX=travelW-(compact?24:42)+Math.sin(progress*7+afterBoard*3)*(compact?6:11);
     const bodyMargin=journeyLength*spacing+32;
-    const railY=Math.max(bodyMargin,Math.min(
-      travelH-bodyMargin,
-      Math.max(175,travelH*.24)+progress*travelH*.24+afterBoard*travelH*.16
-    ));
-
+    const railY=Math.max(bodyMargin,Math.min(travelH-bodyMargin,
+      Math.max(175,travelH*.24)+progress*travelH*.24+afterBoard*travelH*.16));
     const cell=rect.width/game.cols;
     const insideSize=cell-Math.max(2,cell*.22);
-    const downAngle=-Math.PI/2,upAngle=Math.PI/2;
-
     if(!departure){
       const seedBody=game.over?game.body.slice(0,TRAVEL_BODY_LIMIT):game.body;
-      const bodyAngle=scrollDirection>0?downAngle:upAngle;
-      const source=seedBody.map((_,i)=>({
-        x:railX+Math.cos(bodyAngle)*i*spacing,
-        y:railY+Math.sin(bodyAngle)*i*spacing
-      }));
-      departure={
-        body:seedBody.map(p=>({...p})),points:source,size:baseSize,last:now,speed:160,
-        phase:'rail',railSettled:true,visualRailX:railX,visualRailY:railY,
-        bodyAngle,targetAngle:bodyAngle,direction:scrollDirection,
-        viewportWidth:travelW,viewportHeight:travelH,snapshot:null
-      };
+      const source=seedBody.map((_,i)=>({x:railX,y:railY-i*spacing}));
+      departure={body:seedBody.map(p=>({...p})),points:source,size:baseSize,last:now,speed:160,phase:null,snapshot:null};
     }
-
     const d=departure,dt=Math.min(40,Math.max(0,now-d.last))/1000;d.last=now;
+    // Keep entry inside the departure thresholds: crossing an edge must not
+    // start an exit and immediately send the snake back into the board.
     const boardFits=rect.top>=120&&rect.top+rect.width*game.rows/game.cols<=travelH-40;
     const wantsIn=scrollDirection>0&&boardFits&&rect.top<travelH*.55;
-    const phase=wantsIn?'in':'rail';
-    const boardMoved=phase==='in'&&Math.abs((d.boardTop??rect.top)-rect.top)>1;
-    const viewportChanged=d.viewportWidth!==travelW||d.viewportHeight!==travelH;
-
-    if(phase==='rail'&&d.phase==='rail'&&d.railSettled&&!viewportChanged){
-      const follow=1-Math.exp(-dt*18);
-      d.visualRailX+=(railX-d.visualRailX)*follow;
-      d.visualRailY+=(railY-d.visualRailY)*follow;
-
-      if(d.direction!==scrollDirection){
-        const current=d.bodyAngle;
-        let target=scrollDirection>0?downAngle:upAngle;
-        // Turn through the page interior, never around the outside edge.
-        if(scrollDirection<0){
-          while(target>=current)target-=Math.PI*2;
-        }else{
-          while(target<=current)target+=Math.PI*2;
-        }
-        d.targetAngle=target;
-        d.direction=scrollDirection;
-      }
-
-      const turn=1-Math.exp(-dt*10);
-      d.bodyAngle+=(d.targetAngle-d.bodyAngle)*turn;
-      if(Math.abs(d.targetAngle-d.bodyAngle)<.002)d.bodyAngle=d.targetAngle;
-
-      d.points=d.body.map((_,i)=>({
-        x:d.visualRailX+Math.cos(d.bodyAngle)*i*spacing,
-        y:d.visualRailY+Math.sin(d.bodyAngle)*i*spacing
-      }));
-      d.size=baseSize;
-      d.railX=railX;d.railY=railY;
-    }else{
-      const needsPlan=d.phase!==phase||!d.path||boardMoved||viewportChanged;
-      if(needsPlan){
-        const destinationBody=d.body.map(p=>({
-          x:rect.left+(p.x+.5)*cell,
-          y:rect.top+(p.y+.5)*cell
-        }));
-        const target=phase==='in'
-          ?destinationBody
-          :{x:railX,y:railY,direction:scrollDirection>0?1:-1};
-
-        d.boardTop=rect.top;d.railX=railX;d.railY=railY;
-        d.viewportWidth=travelW;d.viewportHeight=travelH;
-        d.path=SnakeEntry.followPath(d.points,target,phase==='in',{width:travelW,height:travelH});
-        d.distance=d.path.start;d.phase=phase;d.sourceSize=d.size;d.railSettled=false;
-        d.endOffsets=phase==='in'
-          ?SnakeEntry.offsetsFor(destinationBody)
-          :d.body.map((_,i)=>i*spacing);
-      }
-
-      const remaining=d.path.total-d.distance;
-      const gameSpeed=cell/(game.mode==='demo'?.105:.130);
-      const desiredSpeed=phase==='in'
-        ?gameSpeed+Math.min(220,Math.max(0,remaining-cell*3)*.8)
-        :Math.max(150,Math.min(600,remaining*1.5));
-      d.speed+=(desiredSpeed-d.speed)*(1-Math.exp(-dt*9));
-      d.distance=Math.min(d.path.total,d.distance+d.speed*dt);
-      const t=clamp((d.distance-d.path.start)/(d.path.total-d.path.start||1));
-      const shape=t*t*(3-2*t);
-      d.size=d.sourceSize+((phase==='in'?insideSize:baseSize)-d.sourceSize)*shape;
-      d.points=d.body.map((_,i)=>SnakeEntry.sample(
-        d.path,
-        d.distance-(d.path.offsets[i]+(d.endOffsets[i]-d.path.offsets[i])*shape)
-      ));
-
-      if(phase==='rail'&&d.distance===d.path.total){
-        const head=d.points[0],neck=d.points[1]||head;
-        d.bodyAngle=Math.atan2(neck.y-head.y,neck.x-head.x);
-        let target=scrollDirection>0?downAngle:upAngle;
-        if(scrollDirection<0){
-          while(target>=d.bodyAngle)target-=Math.PI*2;
-        }else{
-          while(target<=d.bodyAngle)target+=Math.PI*2;
-        }
-        d.targetAngle=target;d.direction=scrollDirection;
-        d.visualRailX=railX;d.visualRailY=railY;d.railSettled=true;d.size=baseSize;
-      }
+    const phase=wantsIn?'in':scrollDirection>0?'down':'up';
+    // The traveler lives in viewport space. Page scroll cannot carry it offscreen.
+    // Replan from the currently drawn body when the moving board changes position.
+    const boardMoved=phase==='in'&&d.boardTop!==rect.top;
+    const railMoved=phase!=='in'&&(Math.abs((d.railY??railY)-railY)>.25||Math.abs((d.railX??railX)-railX)>.25);
+    if(d.phase!==phase||!d.path||boardMoved||railMoved||d.viewportWidth!==travelW||d.viewportHeight!==travelH){
+      const destinationBody=d.body.map(p=>({x:rect.left+(p.x+.5)*cell,y:rect.top+(p.y+.5)*cell}));
+      const sign=phase==='up'?-1:1;
+      const target=phase==='in'?destinationBody:{x:railX,y:railY,direction:sign};
+      d.boardTop=rect.top;d.railX=railX;d.railY=railY;d.viewportWidth=travelW;d.viewportHeight=travelH;
+      d.path=SnakeEntry.followPath(d.points,target,phase==='in',{width:travelW,height:travelH});
+      d.distance=d.path.start;d.phase=phase;d.sourceSize=d.size;
+      d.endOffsets=phase==='in'?SnakeEntry.offsetsFor(destinationBody):d.body.map((_,i)=>i*spacing);
     }
-
+    const remaining=d.path.total-d.distance;
+    const gameSpeed=cell/(game.mode==='demo'?.105:.130);
+    const desiredSpeed=phase==='in'?gameSpeed+Math.min(220,Math.max(0,remaining-cell*3)*.8):Math.max(150,Math.min(600,remaining*1.5));
+    d.speed+=(desiredSpeed-d.speed)*(1-Math.exp(-dt*9));
+    d.distance=Math.min(d.path.total,d.distance+d.speed*dt);
+    const t=clamp((d.distance-d.path.start)/(d.path.total-d.path.start||1));
+    const shape=t*t*(3-2*t);
+    d.size=d.sourceSize+((phase==='in'?insideSize:baseSize)-d.sourceSize)*shape;
+    d.points=d.body.map((_,i)=>SnakeEntry.sample(d.path,d.distance-(d.path.offsets[i]+(d.endOffsets[i]-d.path.offsets[i])*shape)));
     const points=d.points.map(p=>({x:p.x,y:p.y,size:d.size}));
     const complete=phase==='in'&&d.distance===d.path.total;
     if(complete){resumeSnapshot=d.snapshot;departure=null;}
-
     travelCtx.clearRect(0,0,travelW,travelH);
     if(!document.querySelector('dialog[open]')){
       for(let i=points.length-1;i>=0;i--){
-        const p=points[i];
-        travelCtx.globalAlpha=i===0?1:(isiOS?.92:.35+.6*(1-i/points.length));
-        travelCtx.fillStyle=accent;
-        travelCtx.shadowColor=accent;
-        travelCtx.shadowBlur=isiOS?0:(i===0?13:0);
-        travelCtx.beginPath();
-        if(travelCtx.roundRect)travelCtx.roundRect(
-          p.x-p.size/2,p.y-p.size/2,p.size,p.size,Math.min(5,p.size*.2)
-        );
+        const p=points[i];travelCtx.globalAlpha=i===0?1:(isiOS ? .92 : .35+.6*(1-i/points.length));travelCtx.fillStyle=accent;
+        travelCtx.shadowColor=accent;travelCtx.shadowBlur=isiOS?0:(i===0?13:0);travelCtx.beginPath();
+        if(travelCtx.roundRect)travelCtx.roundRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size,Math.min(5,p.size*.2));
         else travelCtx.rect(p.x-p.size/2,p.y-p.size/2,p.size,p.size);
         travelCtx.fill();
       }
       travelCtx.globalAlpha=1;travelCtx.shadowBlur=0;
-
-      const head=points[0],neck=points[1];
-      if(head&&neck){
-        const len=Math.hypot(head.x-neck.x,head.y-neck.y)||1;
-        const dx=(head.x-neck.x)/len,dy=(head.y-neck.y)/len;
-        const eye=Math.max(1.5,head.size*.13);travelCtx.fillStyle=ink;
-        for(const side of [-1,1]){
-          travelCtx.fillRect(
-            head.x+dx*head.size*.22-dy*side*head.size*.22-eye/2,
-            head.y+dy*head.size*.22+dx*side*head.size*.22-eye/2,
-            eye,eye
-          );
-        }
-      }
+      const head=points[0],neck=points[1],len=Math.hypot(head.x-neck.x,head.y-neck.y)||1,dx=(head.x-neck.x)/len,dy=(head.y-neck.y)/len;
+      const eye=Math.max(1.5,head.size*.13);travelCtx.fillStyle=ink;
+      for(const side of [-1,1])travelCtx.fillRect(head.x+dx*head.size*.22-dy*side*head.size*.22-eye/2,head.y+dy*head.size*.22+dx*side*head.size*.22-eye/2,eye,eye);
     }
-
     if(complete){finishJourney();return;}
     journeyFrame=requestAnimationFrame(journeyTick);
   }
+
   let lastDirectionScroll=scrollY;
   // Reuse the actual frozen body on the way out and back, preserving a playable round.
   addEventListener('scroll',()=>{

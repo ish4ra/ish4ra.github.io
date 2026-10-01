@@ -44,10 +44,34 @@
       const sign=target.direction||-1;
       const distance=Math.hypot(target.x-head.x,target.y-head.y);
       const continuing=direction.y*sign>.5&&(target.y-head.y)*sign>=0;
-      // Tiny continued scrolls need a tiny curve, not a full 45px U-turn.
-      const reach=continuing?Math.min(160,distance*.4):Math.max(45,Math.min(160,distance*.4));
-      // Both endpoint tangents point along the actual direction of travel.
-      curve(target,{x:head.x+direction.x*reach,y:head.y+direction.y*reach},{x:target.x,y:target.y-sign*reach});
+      const reversing=direction.y*sign<-.45;
+
+      if(reversing){
+        // Do not squeeze the body through a tight U-turn. Move slightly
+        // inward and follow a true semicircle, which preserves segment
+        // spacing while the head turns to face the opposite scroll direction.
+        const compact=!!bounds&&bounds.width<600;
+        const gaps=body.slice(1).map((p,i)=>Math.hypot(p.x-body[i].x,p.y-body[i].y)).filter(Boolean);
+        const averageGap=gaps.length?gaps.reduce((a,b)=>a+b,0)/gaps.length:(compact?12:16);
+        const radius=Math.max(compact?34:48,Math.min(compact?46:60,averageGap*3.25));
+        const side=!bounds||head.x>bounds.width*.55?-1:1;
+        const centerX=head.x+side*radius,centerY=head.y;
+        const startAngle=side<0?0:Math.PI;
+        const deltaAngle=direction.y*(side<0?1:-1)*Math.PI;
+        const steps=72;
+
+        for(let i=1;i<=steps;i++){
+          const t=i/steps,angle=startAngle+deltaAngle*t;
+          points.push({
+            x:centerX+Math.cos(angle)*radius,
+            y:centerY+Math.sin(angle)*radius
+          });
+        }
+      }else{
+        // Tiny continued scrolls keep the original compact movement.
+        const reach=continuing?Math.min(160,distance*.4):Math.max(45,Math.min(160,distance*.4));
+        curve(target,{x:head.x+direction.x*reach,y:head.y+direction.y*reach},{x:target.x,y:target.y-sign*reach});
+      }
     }
     const lengths=[0];for(let i=1;i<points.length;i++)lengths.push(lengths[i-1]+Math.hypot(points[i].x-points[i-1].x,points[i].y-points[i-1].y));
     const offsets=body.map((_,i)=>lengths[startIndex]-lengths[startIndex-i]);
