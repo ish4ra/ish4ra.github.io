@@ -35,7 +35,7 @@
   let previous=game.body.map(p=>({...p})),localPaused=false,visible=false,frame=0,lastStep=0,clock=0,w=0,h=0,best=0;
   let accent='#c6f37b',ink='#152014',bg='#0d100e',muted='#969c93';
   let sparks=[],touch=null;
-  let arrived=root.classList.contains('motion-paused'),journeyFrame=0,entry=null,departure=null,resumeSnapshot=null,lastScrollPosition=scrollY,scrollDirection=1;
+  let arrived=root.classList.contains('motion-paused'),journeyFrame=0,entry=null,departure=null,resumeSnapshot=null,lastScrollPosition=scrollY,scrollDirection=1,lastScrollActivity=performance.now();
   const traveler=document.createElement('canvas');traveler.className='snake-journey';traveler.setAttribute('aria-hidden','true');
   document.body.append(traveler);const travelCtx=traveler.getContext('2d');
   if(!travelCtx)arrived=true;
@@ -160,15 +160,31 @@
     // start an exit and immediately send the snake back into the board.
     const boardFits=rect.top>=120&&rect.top+rect.width*game.rows/game.cols<=travelH-40;
     const wantsIn=scrollDirection>0&&boardFits&&rect.top<travelH*.55;
-    const phase=wantsIn?'in':scrollDirection>0?'down':'up';
-    // The traveler lives in viewport space. Page scroll cannot carry it offscreen.
-    // Replan from the currently drawn body when the moving board changes position.
+    const idle=now-lastScrollActivity>700&&!wantsIn;
+    const phase=wantsIn?'in':idle?'idle':scrollDirection>0?'down':'up';
+    // Normal scrolling keeps the original motion. Idle mode only plans one
+    // gentle wander leg at a time, so it never chases a moving target frame-by-frame.
     const boardMoved=phase==='in'&&d.boardTop!==rect.top;
-    const railMoved=phase!=='in'&&(Math.abs((d.railY??railY)-railY)>.25||Math.abs((d.railX??railX)-railX)>.25);
-    if(d.phase!==phase||!d.path||boardMoved||railMoved||d.viewportWidth!==travelW||d.viewportHeight!==travelH){
+    const railMoved=(phase==='down'||phase==='up')&&(Math.abs((d.railY??railY)-railY)>.25||Math.abs((d.railX??railX)-railX)>.25);
+    const idleComplete=phase==='idle'&&d.phase==='idle'&&d.path&&d.distance===d.path.total;
+    if(d.phase!==phase||!d.path||boardMoved||railMoved||idleComplete||d.viewportWidth!==travelW||d.viewportHeight!==travelH){
       const destinationBody=d.body.map(p=>({x:rect.left+(p.x+.5)*cell,y:rect.top+(p.y+.5)*cell}));
-      const sign=phase==='up'?-1:1;
-      const target=phase==='in'?destinationBody:{x:railX,y:railY,direction:sign};
+      let target,sign=phase==='up'?-1:1;
+      if(phase==='in'){
+        target=destinationBody;
+      }else if(phase==='idle'){
+        const step=((d.idleStep??-1)+1)%4;d.idleStep=step;
+        const dx=compact?[-20,-36,-26,-8][step]:[-30,-54,-40,-12][step];
+        const dy=compact?[-22,14,30,-10][step]:[-32,20,40,-14][step];
+        const head=d.points[0]||{x:railX,y:railY};
+        const idleX=Math.max(compact?18:24,Math.min(travelW-(compact?18:24),railX+dx));
+        const idleY=Math.max(bodyMargin,Math.min(travelH-bodyMargin,railY+dy));
+        const vertical=idleY-head.y;
+        sign=Math.abs(vertical)>6?Math.sign(vertical):((step&1)?-1:1);
+        target={x:idleX,y:idleY,direction:sign};
+      }else{
+        target={x:railX,y:railY,direction:sign};
+      }
       d.boardTop=rect.top;d.railX=railX;d.railY=railY;d.viewportWidth=travelW;d.viewportHeight=travelH;
       d.path=SnakeEntry.followPath(d.points,target,phase==='in',{width:travelW,height:travelH});
       d.distance=d.path.start;d.phase=phase;d.sourceSize=d.size;
@@ -176,7 +192,11 @@
     }
     const remaining=d.path.total-d.distance;
     const gameSpeed=cell/(game.mode==='demo'?.105:.130);
-    const desiredSpeed=phase==='in'?gameSpeed+Math.min(220,Math.max(0,remaining-cell*3)*.8):Math.max(150,Math.min(600,remaining*1.5));
+    const desiredSpeed=phase==='in'
+      ?gameSpeed+Math.min(220,Math.max(0,remaining-cell*3)*.8)
+      :phase==='idle'
+        ?Math.max(85,Math.min(145,remaining*1.15))
+        :Math.max(150,Math.min(600,remaining*1.5));
     d.speed+=(desiredSpeed-d.speed)*(1-Math.exp(-dt*9));
     d.distance=Math.min(d.path.total,d.distance+d.speed*dt);
     const t=clamp((d.distance-d.path.start)/(d.path.total-d.path.start||1));
@@ -207,6 +227,7 @@
   let lastDirectionScroll=scrollY;
   // Reuse the actual frozen body on the way out and back, preserving a playable round.
   addEventListener('scroll',()=>{
+    lastScrollActivity=performance.now();
     const movingUp=scrollY<lastScrollPosition;lastScrollPosition=scrollY;
     if(Math.abs(scrollY-lastDirectionScroll)>3){scrollDirection=movingUp?-1:1;lastDirectionScroll=scrollY;}
     if(!arrived||!travelCtx||root.classList.contains('motion-paused'))return;

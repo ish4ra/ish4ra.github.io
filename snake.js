@@ -6,6 +6,6 @@
     script.defer = true;
     document.head.append(script);
   };
-  load('snake-core.js?v=23');
+  load('snake-core.js?v=24');
   load('leaderboard.js?v=1');
 })();
