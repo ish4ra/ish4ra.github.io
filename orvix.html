@@ -6,13 +6,14 @@
   <meta name="theme-color" content="#050806">
   <meta name="description" content="Orvix is an open-source, cross-platform media hub by Ishara Lakshan. Download the latest Windows, Android, Android TV and macOS builds.">
   <title>Orvix · Ishara Lakshan</title>
-  <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/ish4ra/Orvix/main/assets/branding/orvix_icon.png">
+  <link rel="icon" type="image/svg+xml" href="assets/orvix-mark.svg">
   <link rel="stylesheet" href="style.css?v=18">
-  <link rel="stylesheet" href="orvix.css?v=1">
+  <link rel="stylesheet" href="orvix.css?v=2">
   <script src="orvix.js?v=1" defer></script>
 </head>
 <body class="orvix-page">
 <a class="skip" href="#main">Skip to content</a>
+
 <header class="orvix-header">
   <a class="brand" href="index.html#home" aria-label="Back to Ishara Lakshan home">il<span>.</span></a>
   <nav aria-label="Orvix navigation"><a href="#downloads">Downloads</a><a href="#community">Community</a><a href="#support">Support</a></nav>
@@ -22,53 +23,120 @@
 <main id="main" class="orvix-main">
   <section class="orvix-hero">
     <div class="orvix-hero-copy">
-      <div class="orvix-brandline"><img src="https://raw.githubusercontent.com/ish4ra/Orvix/main/assets/branding/orvix_icon.png" alt="Orvix app icon"><span>OPEN SOURCE · CROSS-PLATFORM</span></div>
+      <div class="orvix-brandline"><img src="assets/orvix-mark.svg" alt="" aria-hidden="true"><span>OPEN SOURCE · CROSS-PLATFORM</span></div>
       <h1>Orvix<span>.</span></h1>
       <p class="orvix-lead">A cinematic media hub built around discovery, flexible source workflows, native playback and smart subtitles across desktop, mobile and TV.</p>
       <div class="orvix-actions"><a class="button primary" href="#downloads">Download latest <span aria-hidden="true">↓</span></a><a class="button" href="https://github.com/ish4ra/Orvix" target="_blank" rel="noopener noreferrer">View source on GitHub <span aria-hidden="true">↗</span></a></div>
       <div class="orvix-meta"><span>FLUTTER + DART</span><span>AGPL-3.0-ONLY</span><span>ACTIVE DEVELOPMENT</span></div>
     </div>
-    <div class="orvix-banner-frame"><img src="https://raw.githubusercontent.com/ish4ra/Orvix/main/assets/branding/orvix_banner.png" alt="Orvix banner artwork"></div>
+
+    <div class="orvix-visual" aria-label="Orvix visual identity">
+      <span class="visual-orbit orbit-one" aria-hidden="true"></span>
+      <span class="visual-orbit orbit-two" aria-hidden="true"></span>
+      <span class="visual-orbit orbit-three" aria-hidden="true"></span>
+      <span class="visual-glow" aria-hidden="true"></span>
+      <span class="visual-label visual-label-top">MEDIA / DISCOVERY / PLAYBACK</span>
+      <div class="visual-lockup">
+        <img src="assets/orvix-mark.svg" alt="" aria-hidden="true">
+        <div><small>ORVIX / OPEN MEDIA</small><strong>orvix</strong></div>
+      </div>
+      <span class="visual-label visual-label-bottom">WINDOWS · ANDROID · ANDROID TV · MACOS</span>
+    </div>
   </section>
 
   <section id="downloads" class="orvix-section">
-    <div class="orvix-section-head"><div><p class="eyebrow">DOWNLOADS</p><h2>Latest build<span>.</span></h2></div><div class="release-status"><span id="release-channel">CHECKING RELEASE</span><strong id="release-version">Latest</strong><small id="release-date">Fetching the newest published build...</small></div></div>
+    <div class="orvix-section-head">
+      <div><p class="eyebrow">DOWNLOADS</p><h2>Latest build<span>.</span></h2></div>
+      <div class="release-status"><span id="release-channel">CHECKING RELEASE</span><strong id="release-version">Latest</strong><small id="release-date">Fetching the newest published build...</small></div>
+    </div>
+
     <div class="download-grid">
       <a class="download-card" data-platform="windows" href="https://github.com/ish4ra/Orvix/releases">
-        <span class="platform-icon windows-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <div><span class="download-kicker">WINDOWS</span><h3>Windows x64</h3><p>Installer EXE for Windows desktop.</p><small data-asset-meta>Latest release</small></div><span class="download-arrow" aria-hidden="true">↓</span>
+        <div class="download-card-head">
+          <span class="platform-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#windows"></use></svg></span>
+          <span class="download-kicker">WINDOWS</span>
+          <span class="download-arrow" aria-hidden="true">↓</span>
+        </div>
+        <div class="download-card-body"><h3>Windows x64</h3><p>Installer EXE for Windows desktop.</p></div>
+        <div class="download-card-foot"><small data-asset-meta>Latest release</small><span>DOWNLOAD BUILD ↘</span></div>
       </a>
+
       <a class="download-card" data-platform="android" href="https://github.com/ish4ra/Orvix/releases">
-        <span class="platform-icon phone-icon" aria-hidden="true"><i></i><b></b></span>
-        <div><span class="download-kicker">ANDROID</span><h3>Android Mobile</h3><p>Universal APK for Android phones and tablets.</p><small data-asset-meta>Latest release</small></div><span class="download-arrow" aria-hidden="true">↓</span>
+        <div class="download-card-head">
+          <span class="platform-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#android"></use></svg></span>
+          <span class="download-kicker">ANDROID</span>
+          <span class="download-arrow" aria-hidden="true">↓</span>
+        </div>
+        <div class="download-card-body"><h3>Android Mobile</h3><p>Universal APK for Android phones and tablets.</p></div>
+        <div class="download-card-foot"><small data-asset-meta>Latest release</small><span>DOWNLOAD APK ↘</span></div>
       </a>
+
       <a class="download-card" data-platform="tv" href="https://github.com/ish4ra/Orvix/releases">
-        <span class="platform-icon tv-icon" aria-hidden="true"><i></i></span>
-        <div><span class="download-kicker">ANDROID TV</span><h3>Android TV</h3><p>Dedicated APK for television devices.</p><small data-asset-meta>Latest release</small></div><span class="download-arrow" aria-hidden="true">↓</span>
+        <div class="download-card-head">
+          <span class="platform-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#android-tv"></use></svg></span>
+          <span class="download-kicker">ANDROID TV</span>
+          <span class="download-arrow" aria-hidden="true">↓</span>
+        </div>
+        <div class="download-card-body"><h3>Android TV</h3><p>Dedicated APK designed for television devices.</p></div>
+        <div class="download-card-foot"><small data-asset-meta>Latest release</small><span>DOWNLOAD TV APK ↘</span></div>
       </a>
+
       <a class="download-card" data-platform="macos" href="https://github.com/ish4ra/Orvix/releases">
-        <span class="platform-icon laptop-icon" aria-hidden="true"><i></i><b></b></span>
-        <div><span class="download-kicker">MACOS</span><h3>macOS</h3><p>Application ZIP for macOS desktop.</p><small data-asset-meta>Latest release</small></div><span class="download-arrow" aria-hidden="true">↓</span>
+        <div class="download-card-head">
+          <span class="platform-mark"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#apple"></use></svg></span>
+          <span class="download-kicker">MACOS</span>
+          <span class="download-arrow" aria-hidden="true">↓</span>
+        </div>
+        <div class="download-card-body"><h3>macOS</h3><p>Application ZIP for macOS desktop.</p></div>
+        <div class="download-card-foot"><small data-asset-meta>Latest release</small><span>DOWNLOAD ZIP ↘</span></div>
       </a>
     </div>
-    <p class="download-note">The buttons automatically follow the newest published Orvix GitHub release. If GitHub release data cannot be loaded, they fall back to the Releases page.</p>
+    <p class="download-note">Download buttons automatically follow the newest published Orvix GitHub release. If release data cannot be loaded, they fall back to the Releases page.</p>
   </section>
 
   <section id="community" class="orvix-section">
     <div class="orvix-section-head"><div><p class="eyebrow">COMMUNITY</p><h2>Follow the project<span>.</span></h2></div><p>Updates, discussions, releases and source code.</p></div>
-    <div class="orvix-link-grid">
-      <a href="https://fosstodon.org/@orvix" target="_blank" rel="me noopener noreferrer"><span>MASTODON</span><h3>@orvix@fosstodon.org</h3><p>Project updates and FOSS conversations on Fosstodon.</p><b aria-hidden="true">↗</b></a>
-      <a href="https://lemmy.ml/c/Orvix" target="_blank" rel="noopener noreferrer"><span>LEMMY</span><h3>c/Orvix</h3><p>Community posts and discussion around Orvix.</p><b aria-hidden="true">↗</b></a>
-      <a href="https://github.com/ish4ra/Orvix" target="_blank" rel="noopener noreferrer"><span>GITHUB</span><h3>ish4ra/Orvix</h3><p>Source code, issues, releases and development history.</p><b aria-hidden="true">↗</b></a>
+    <div class="brand-card-grid">
+      <a class="brand-card" style="--brand:#6364FF" href="https://fosstodon.org/@orvix" target="_blank" rel="me noopener noreferrer">
+        <div class="brand-card-top"><span class="brand-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#mastodon"></use></svg></span><span class="brand-name">MASTODON</span><span class="brand-arrow" aria-hidden="true">↗</span></div>
+        <h3>@orvix@fosstodon.org</h3><p>Project updates, release notes and FOSS conversations on Fosstodon.</p>
+        <span class="brand-cta">Follow Orvix <b aria-hidden="true">→</b></span>
+      </a>
+
+      <a class="brand-card" style="--brand:#7EC953" href="https://lemmy.ml/c/Orvix" target="_blank" rel="noopener noreferrer">
+        <div class="brand-card-top"><span class="brand-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#lemmy"></use></svg></span><span class="brand-name">LEMMY</span><span class="brand-arrow" aria-hidden="true">↗</span></div>
+        <h3>c/Orvix</h3><p>Community posts, discussion and feedback around Orvix development.</p>
+        <span class="brand-cta">Open community <b aria-hidden="true">→</b></span>
+      </a>
+
+      <a class="brand-card" style="--brand:#F1F3EE" href="https://github.com/ish4ra/Orvix" target="_blank" rel="noopener noreferrer">
+        <div class="brand-card-top"><span class="brand-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#github"></use></svg></span><span class="brand-name">GITHUB</span><span class="brand-arrow" aria-hidden="true">↗</span></div>
+        <h3>ish4ra/Orvix</h3><p>Source code, issues, releases and the complete development history.</p>
+        <span class="brand-cta">View repository <b aria-hidden="true">→</b></span>
+      </a>
     </div>
   </section>
 
   <section id="support" class="orvix-section orvix-support">
     <div class="orvix-section-head"><div><p class="eyebrow">SUPPORT</p><h2>Support development<span>.</span></h2></div><p>Help fund testing, development and future open-source releases.</p></div>
-    <div class="orvix-link-grid support-links">
-      <a href="https://github.com/sponsors/ish4ra" target="_blank" rel="noopener noreferrer"><span>GITHUB</span><h3>GitHub Sponsors</h3><p>Support my open-source work directly through GitHub.</p><b aria-hidden="true">↗</b></a>
-      <a href="https://www.buymeacoffee.com/ish4ra" target="_blank" rel="noopener noreferrer"><span>BUY ME A COFFEE</span><h3>Buy Me a Coffee</h3><p>Send a one-time contribution to support development.</p><b aria-hidden="true">↗</b></a>
-      <a href="https://ko-fi.com/ish4ra" target="_blank" rel="noopener noreferrer"><span>KO-FI</span><h3>Ko-fi</h3><p>Support the project with a quick contribution on Ko-fi.</p><b aria-hidden="true">↗</b></a>
+    <div class="support-card-grid">
+      <a class="support-card" style="--brand:#EA4AAA" href="https://github.com/sponsors/ish4ra" target="_blank" rel="noopener noreferrer">
+        <div class="support-card-top"><span class="support-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#github-sponsors"></use></svg></span><span class="support-arrow" aria-hidden="true">↗</span></div>
+        <span class="support-kicker">GITHUB SPONSORS</span><h3>Back the open-source work.</h3><p>Support ongoing development directly through GitHub Sponsors.</p>
+        <span class="support-cta">Become a sponsor <b aria-hidden="true">→</b></span>
+      </a>
+
+      <a class="support-card" style="--brand:#FFDD00" href="https://www.buymeacoffee.com/ish4ra" target="_blank" rel="noopener noreferrer">
+        <div class="support-card-top"><span class="support-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#buymeacoffee"></use></svg></span><span class="support-arrow" aria-hidden="true">↗</span></div>
+        <span class="support-kicker">BUY ME A COFFEE</span><h3>Send a quick contribution.</h3><p>A simple one-time way to support development, testing and releases.</p>
+        <span class="support-cta">Buy me a coffee <b aria-hidden="true">→</b></span>
+      </a>
+
+      <a class="support-card" style="--brand:#13C3FF" href="https://ko-fi.com/ish4ra" target="_blank" rel="noopener noreferrer">
+        <div class="support-card-top"><span class="support-logo"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="assets/orvix-icons.svg#kofi"></use></svg></span><span class="support-arrow" aria-hidden="true">↗</span></div>
+        <span class="support-kicker">KO-FI</span><h3>Keep the project moving.</h3><p>Support Orvix and future open-source improvements through Ko-fi.</p>
+        <span class="support-cta">Support on Ko-fi <b aria-hidden="true">→</b></span>
+      </a>
     </div>
   </section>
 </main>
