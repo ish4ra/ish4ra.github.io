@@ -15,7 +15,7 @@
     .cards{display:grid;grid-template-columns:repeat(8,minmax(135px,1fr));gap:12px}.card,.panel{background:var(--card);border:1px solid var(--line);border-radius:18px}.card{padding:16px}.metric{font-size:28px;font-weight:900;margin-top:8px}.label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.09em}
     .grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-top:14px}.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:14px}.panel{padding:18px;min-width:0}.panel h2{font-size:16px;margin:0 0 14px}.tableWrap{overflow:auto;max-height:430px}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:10px 9px;border-bottom:1px solid #172218;white-space:nowrap}th{color:var(--muted);font-weight:700;position:sticky;top:0;background:var(--card)}.online{color:var(--lime2);font-weight:800}
     .bars{display:grid;gap:10px}.barRow{display:grid;grid-template-columns:minmax(90px,180px) 1fr 48px;gap:10px;align-items:center}.barTrack{height:8px;background:#141d15;border-radius:20px;overflow:hidden}.barFill{height:100%;background:var(--lime);border-radius:20px}.barName{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}.barCount{text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
-    .pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;background:#152116;color:#cfff91;font-size:11px;font-weight:750}.releaseAssets{display:grid;gap:3px;margin-top:6px;color:var(--muted);font-size:11px}.releaseAsset{display:flex;gap:8px;justify-content:space-between}.releaseAssetName{max-width:360px;overflow:hidden;text-overflow:ellipsis}.danger{color:var(--danger)}.sectionTitle{margin:26px 0 10px;font-size:12px;color:var(--muted);font-weight:850;letter-spacing:.12em;text-transform:uppercase}.empty{color:var(--muted);padding:14px 0}
+    .pill{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;background:#152116;color:#cfff91;font-size:11px;font-weight:750}.note{color:var(--muted);font-size:12px;line-height:1.45;margin:-6px 0 12px}.releaseAssets{display:grid;gap:3px;margin-top:6px;color:var(--muted);font-size:11px}.releaseAsset{display:flex;gap:8px;justify-content:space-between}.releaseAssetName{max-width:360px;overflow:hidden;text-overflow:ellipsis}.danger{color:var(--danger)}.sectionTitle{margin:26px 0 10px;font-size:12px;color:var(--muted);font-weight:850;letter-spacing:.12em;text-transform:uppercase}.empty{color:var(--muted);padding:14px 0}
     @media(max-width:1200px){.cards{grid-template-columns:repeat(4,1fr)}}@media(max-width:850px){.cards{grid-template-columns:repeat(2,1fr)}.grid2,.grid3{grid-template-columns:1fr}.wrap{padding:16px}.top{align-items:flex-start;flex-direction:column}}
   </style>
 </head>
@@ -50,9 +50,10 @@
     </div>
     <div class="sectionTitle">Releases & health</div>
     <div class="grid2">
-      <section class="panel"><h2>GitHub releases</h2><div class="tableWrap"><table><thead><tr><th>Release</th><th>Published</th><th>Total</th><th>Android Mobile</th><th>Android TV</th><th>Windows</th><th>macOS</th><th>Type</th></tr></thead><tbody id="releasesBody"></tbody></table></div></section>
-      <section class="panel"><h2>Recent errors</h2><div class="tableWrap"><table><thead><tr><th>Time</th><th>Type</th><th>Platform</th><th>Version</th><th>Message</th></tr></thead><tbody id="errorsBody"></tbody></table></div></section>
+      <section class="panel"><h2>GitHub Downloads (raw)</h2><p class="note">Non-unique asset downloads reported by GitHub. Repeat downloads can increase these counts.</p><div class="tableWrap"><table><thead><tr><th>Release</th><th>Published</th><th>Raw total</th><th>Android Mobile</th><th>Android TV</th><th>Windows</th><th>macOS</th><th>Type</th></tr></thead><tbody id="releasesBody"></tbody></table></div></section>
+      <section class="panel"><h2>Verified Orvix Devices</h2><p class="note">Unique devices that opened Orvix on each version. One installation counts once per version.</p><div class="tableWrap"><table><thead><tr><th>Version</th><th>Unique devices</th><th>Android Mobile</th><th>Android TV</th><th>Windows</th><th>macOS</th><th>Last seen</th></tr></thead><tbody id="verifiedBody"></tbody></table></div></section>
     </div>
+    <section class="panel" style="margin-top:14px"><h2>Recent errors</h2><div class="tableWrap"><table><thead><tr><th>Time</th><th>Type</th><th>Platform</th><th>Version</th><th>Message</th></tr></thead><tbody id="errorsBody"></tbody></table></div></section>
   </main>
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -107,7 +108,7 @@
     function render(data) {
       el("generated").textContent = "Updated " + new Date(data.generated_at).toLocaleString();
       const o = data.overview;
-      const cards = [["Online now",o.online_now],["Registered users",o.registered_users],["Known installs",o.known_installations],["Active today",o.active_today],["Active 7d",o.active_7d],["Active 30d",o.active_30d],["GitHub downloads",o.github_downloads],["Avg session",duration(o.avg_session_seconds)]];
+      const cards = [["Online now",o.online_now],["Registered users",o.registered_users],["Known installs",o.known_installations],["Active today",o.active_today],["Active 7d",o.active_7d],["Active 30d",o.active_30d],["GitHub raw downloads",o.github_downloads],["Avg session",duration(o.avg_session_seconds)]];
       el("cards").innerHTML = cards.map(([label,value]) => '<div class="card"><div class="label">'+esc(label)+'</div><div class="metric">'+esc(typeof value==="number"?fmt.format(value):value)+'</div></div>').join("");
       el("liveBody").innerHTML = data.online.length ? data.online.map(row => {
         const started = Math.max(0,Math.round((Date.now()-new Date(row.started_at).getTime())/1000));
@@ -124,6 +125,12 @@
         ).join('')+'</div>' : '';
         return '<tr><td>'+esc(row.tag)+assetHtml+'</td><td>'+esc(row.published_at?new Date(row.published_at).toLocaleDateString():"—")+'</td><td><strong>'+fmt.format(row.total_downloads)+'</strong></td><td>'+fmt.format(p["Android Mobile"]||0)+'</td><td>'+fmt.format(p["Android TV"]||0)+'</td><td>'+fmt.format(p["Windows"]||0)+'</td><td>'+fmt.format(p["macOS"]||0)+'</td><td>'+(row.prerelease?'<span class="pill">Beta</span>':'<span class="pill">Stable</span>')+'</td></tr>';
       }).join("") : '<tr><td colspan="8" class="empty">GitHub release data unavailable</td></tr>';
+      el("verifiedBody").innerHTML = data.verified_versions?.length ? data.verified_versions.map(row => {
+        const p = row.devices_by_platform || {};
+        const version = String(row.version || "—");
+        const label = version.startsWith("v") ? version : "v" + version;
+        return '<tr><td>'+esc(label)+'</td><td><strong>'+fmt.format(row.unique_devices||0)+'</strong></td><td>'+fmt.format(p["Android Mobile"]||0)+'</td><td>'+fmt.format(p["Android TV"]||0)+'</td><td>'+fmt.format(p["Windows"]||0)+'</td><td>'+fmt.format(p["macOS"]||0)+'</td><td>'+esc(relative(row.last_seen_at))+'</td></tr>';
+      }).join("") : '<tr><td colspan="7" class="empty">No verified device telemetry yet. Counts start with telemetry-enabled builds.</td></tr>';
       el("errorsBody").innerHTML = data.recent_errors.length ? data.recent_errors.map(row => '<tr><td>'+esc(relative(row.occurred_at))+'</td><td class="'+(row.fatal?'danger':'')+'">'+esc(row.error_type)+'</td><td>'+esc(row.platform)+'</td><td>'+esc(row.app_version)+'</td><td title="'+esc(row.message)+'">'+esc(String(row.message||"").slice(0,80))+'</td></tr>').join("") : '<tr><td colspan="5" class="empty">No recorded errors</td></tr>';
     }
     async function refresh() {
