@@ -35,8 +35,8 @@
     </div>
     <div id="cards" class="cards"></div>
     <div class="grid2">
-      <section class="panel"><h2>Live users</h2><div class="tableWrap"><table><thead><tr><th>User</th><th>Country</th><th>Platform</th><th>Device</th><th>Version</th><th>Session</th><th>OS</th></tr></thead><tbody id="liveBody"></tbody></table></div></section>
-      <section class="panel"><h2>Countries</h2><div id="countries" class="bars"></div></section>
+      <section class="panel"><h2>Live users</h2><div class="tableWrap"><table><thead><tr><th>User</th><th>Network country</th><th>Platform</th><th>Device</th><th>Version</th><th>Session</th><th>OS</th></tr></thead><tbody id="liveBody"></tbody></table></div></section>
+      <section class="panel"><h2>Network countries</h2><p class="note">Approximate network country. VPNs or proxies can make this differ from the device's physical location.</p><div id="countries" class="bars"></div></section>
     </div>
     <div class="grid3">
       <section class="panel"><h2>Platforms</h2><div id="platforms" class="bars"></div></section>
@@ -45,12 +45,12 @@
     </div>
     <div class="sectionTitle">Accounts & installs</div>
     <div class="grid2">
-      <section class="panel"><h2>Registered users</h2><div class="tableWrap"><table><thead><tr><th>Name</th><th>Email</th><th>Country</th><th>Installs</th><th>Device</th><th>Last active</th><th>Version</th></tr></thead><tbody id="usersBody"></tbody></table></div></section>
-      <section class="panel"><h2>Recent installations</h2><div class="tableWrap"><table><thead><tr><th>ID</th><th>Country</th><th>Platform</th><th>Device</th><th>Version</th><th>Locale</th><th>Last seen</th></tr></thead><tbody id="installsBody"></tbody></table></div></section>
+      <section class="panel"><h2>Registered users</h2><div class="tableWrap"><table><thead><tr><th>Name</th><th>Email</th><th>Network country</th><th>Installs</th><th>Device</th><th>Last active</th><th>Version</th></tr></thead><tbody id="usersBody"></tbody></table></div></section>
+      <section class="panel"><h2>Recent installations</h2><div class="tableWrap"><table><thead><tr><th>ID</th><th>Network country</th><th>Platform</th><th>Device</th><th>Version</th><th>Locale</th><th>Last seen</th></tr></thead><tbody id="installsBody"></tbody></table></div></section>
     </div>
     <div class="sectionTitle">Releases & health</div>
     <div class="grid2">
-      <section class="panel"><h2>GitHub Downloads (raw)</h2><p class="note">Non-unique asset downloads reported by GitHub. Repeat downloads can increase these counts.</p><div class="tableWrap"><table><thead><tr><th>Release</th><th>Published</th><th>Raw total</th><th>Android Mobile</th><th>Android TV</th><th>Windows</th><th>macOS</th><th>Type</th></tr></thead><tbody id="releasesBody"></tbody></table></div></section>
+      <section class="panel"><h2>GitHub Downloads (raw)</h2><p class="note">Non-unique asset downloads reported by GitHub. Repeat downloads and maintainer/test downloads can increase these counts.</p><div class="tableWrap"><table><thead><tr><th>Release</th><th>Published</th><th>Raw total</th><th>Android Mobile</th><th>Android TV</th><th>Windows</th><th>macOS</th><th>Type</th></tr></thead><tbody id="releasesBody"></tbody></table></div></section>
       <section class="panel"><h2>Verified Orvix Devices</h2><p class="note">Unique devices that opened Orvix on each version. One installation counts once per version.</p><div class="tableWrap"><table><thead><tr><th>Version</th><th>Unique devices</th><th>Android Mobile</th><th>Android TV</th><th>Windows</th><th>macOS</th><th>Last seen</th></tr></thead><tbody id="verifiedBody"></tbody></table></div></section>
     </div>
     <section class="panel" style="margin-top:14px"><h2>Recent errors</h2><div class="tableWrap"><table><thead><tr><th>Time</th><th>Type</th><th>Platform</th><th>Version</th><th>Message</th></tr></thead><tbody id="errorsBody"></tbody></table></div></section>
@@ -123,7 +123,7 @@
         const assetHtml = assets.length ? '<div class="releaseAssets">'+assets.map(asset =>
           '<div class="releaseAsset"><span class="releaseAssetName" title="'+esc(asset.name)+'">'+esc(asset.name)+'</span><strong>'+fmt.format(asset.downloads||0)+'</strong></div>'
         ).join('')+'</div>' : '';
-        return '<tr><td>'+esc(row.tag)+assetHtml+'</td><td>'+esc(row.published_at?new Date(row.published_at).toLocaleDateString():"—")+'</td><td><strong>'+fmt.format(row.total_downloads)+'</strong></td><td>'+fmt.format(p["Android Mobile"]||0)+'</td><td>'+fmt.format(p["Android TV"]||0)+'</td><td>'+fmt.format(p["Windows"]||0)+'</td><td>'+fmt.format(p["macOS"]||0)+'</td><td>'+(row.prerelease?'<span class="pill">Beta</span>':'<span class="pill">Stable</span>')+'</td></tr>';
+        return '<tr><td>'+esc(row.tag)+assetHtml+'</td><td>'+esc(row.published_at?new Date(row.published_at).toLocaleDateString():"—")+'</td><td><strong>'+fmt.format(row.total_downloads)+'</strong></td><td>'+fmt.format(p["Android Mobile"]||0)+'</td><td>'+fmt.format(p["Android TV"]||0)+'</td><td>'+fmt.format(p["Windows"]||0)+'</td><td>'+fmt.format(p["macOS"]||0)+'</td><td>'+(row.draft?'<span class="pill">Draft / Private</span>':row.prerelease?'<span class="pill">Beta</span>':'<span class="pill">Stable</span>')+'</td></tr>';
       }).join("") : '<tr><td colspan="8" class="empty">GitHub release data unavailable</td></tr>';
       el("verifiedBody").innerHTML = data.verified_versions?.length ? data.verified_versions.map(row => {
         const p = row.devices_by_platform || {};
